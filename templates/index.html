@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON ÉLITE — Fashion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#f5f0e8;--black:#080808;--gold:#c9a84c;--gold-light:#e8d5a3;--warm-grey:#8a7f72;--border:rgba(201,168,76,0.2)}
+body{font-family:'Segoe UI',sans-serif;background:var(--black);color:var(--cream)}
+.wrapper{display:grid;grid-template-columns:1fr 1fr;min-height:680px}
+.left-panel{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:60px 70px;background:linear-gradient(160deg,#0e0c0a,#080a0f,#09080e)}
+.left-panel::after{content:'';position:absolute;right:0;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,var(--gold) 40%,var(--gold) 60%,transparent);opacity:0.3}
+.orb{position:absolute;border-radius:50%;pointer-events:none}
+.orb-1{width:460px;height:460px;top:-100px;left:-100px;background:radial-gradient(circle,rgba(201,168,76,0.15) 0%,transparent 70%);animation:oFloat 13s ease-in-out infinite alternate}
+.orb-2{width:260px;height:260px;bottom:60px;right:-70px;background:radial-gradient(circle,rgba(201,168,76,0.09) 0%,transparent 70%);animation:oFloat 10s ease-in-out infinite alternate-reverse}
+@keyframes oFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,-28px) scale(1.07)}}
+.ghost-wrap{position:absolute;inset:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;justify-content:center;padding:0 70px;gap:0}
+.gw{font-family:Georgia,serif;font-weight:900;font-size:clamp(60px,8vw,110px);line-height:0.9;color:transparent;-webkit-text-stroke:1px rgba(201,168,76,0.1);white-space:nowrap}
+.gw:nth-child(2){margin-left:50px}.gw:nth-child(3){margin-left:-15px}
+.brand-block{position:relative;z-index:3}
+.brand-eyebrow{font-size:9px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.brand-eyebrow::before{content:'';width:26px;height:1px;background:var(--gold);opacity:0.5}
+.brand-name{font-family:Georgia,serif;font-size:clamp(50px,5.8vw,80px);font-weight:900;line-height:0.88;letter-spacing:-2px;color:var(--cream)}
+.brand-name em{display:block;font-style:italic;font-weight:400;color:var(--gold);font-size:0.62em;letter-spacing:5px}
+.brand-desc{font-family:Georgia,serif;font-size:17px;font-weight:300;color:var(--warm-grey);margin-top:22px;line-height:1.85;max-width:290px}
+.right-panel{display:flex;align-items:center;justify-content:center;padding:50px 65px;background:linear-gradient(150deg,#0c0c0c,#0f0e14);position:relative;overflow:hidden}
+.form-card{width:100%;max-width:400px;position:relative;z-index:2}
+.form-hero{position:relative;height:110px;margin-bottom:28px;border-radius:3px;overflow:hidden}
+.fh-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1c1710,#100e1c,#130f09)}
+.fh-glow{position:absolute;inset:0;background:radial-gradient(ellipse 85% 100% at 50% 120%,rgba(201,168,76,0.22) 0%,transparent 68%);animation:gPulse 5s ease-in-out infinite alternate}
+@keyframes gPulse{from{opacity:0.6}to{opacity:1}}
+.fh-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.fh-title{font-family:Georgia,serif;font-size:24px;font-weight:700;letter-spacing:6px;text-transform:uppercase;color:var(--cream);transition:opacity 0.35s,transform 0.35s}
+.fh-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:0.75;transition:opacity 0.35s}
+.fh-title.switching,.fh-sub.switching{opacity:0;transform:translateY(8px)}
+.form-header{margin-bottom:20px}
+.f-eyebrow{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.f-eyebrow::after{content:'';flex:1;height:1px;background:var(--border)}
+.f-title{font-family:Georgia,serif;font-size:26px;font-weight:700;color:var(--cream);line-height:1.1}
+.f-title em{font-style:italic;color:var(--gold)}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px}
+.tab{font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:500;padding:10px 0;margin-right:30px;cursor:pointer;color:var(--warm-grey);transition:color 0.3s;position:relative}
+.tab.active{color:var(--cream)}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--gold);animation:lineIn 0.35s ease forwards;transform-origin:left}
+@keyframes lineIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.tab:hover{color:var(--cream)}
+
+.sections-wrap{position:relative;overflow:hidden}
+.form-section{
+  opacity:1;
+  transform:translateX(0);
+  transition:opacity 0.38s cubic-bezier(.4,0,.2,1), transform 0.38s cubic-bezier(.4,0,.2,1);
+}
+.form-section.hidden-left{opacity:0;transform:translateX(-32px);position:absolute;top:0;left:0;width:100%;pointer-events:none}
+.form-section.hidden-right{opacity:0;transform:translateX(32px);position:absolute;top:0;left:0;width:100%;pointer-events:none}
+
+.fg{margin-bottom:16px}
+label{display:block;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--warm-grey);margin-bottom:8px;font-weight:500}
+.iw{position:relative}
+.iw input{width:100%;padding:12px 42px 12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--cream);font-family:'Segoe UI',sans-serif;font-size:14px;outline:none;transition:border-color 0.3s,background 0.3s}
+.iw input::placeholder{color:rgba(138,127,114,0.4)}
+.iw input:focus{border-color:rgba(201,168,76,0.5);background:rgba(201,168,76,0.04)}
+.i-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:0.22;font-size:13px;pointer-events:none;transition:opacity 0.3s}
+.iw input:focus~.i-icon{opacity:0.55}
+.sw select{width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--cream);font-family:'Segoe UI',sans-serif;font-size:14px;outline:none;cursor:pointer;appearance:none;transition:border-color 0.3s}
+.sw select:focus{border-color:rgba(201,168,76,0.5)}
+.sw select option{background:#111}
+.admin-field{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.45s cubic-bezier(.16,1,.3,1),opacity 0.35s}
+.admin-field.visible{max-height:90px;opacity:1}
+.forgot{text-align:right;margin-top:-4px;margin-bottom:14px}
+.forgot a{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warm-grey);text-decoration:none;transition:color 0.3s}
+.forgot a:hover{color:var(--gold)}
+.btn-main{width:100%;padding:14px;background:var(--gold);border:none;color:#080808;font-family:'Segoe UI',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;cursor:pointer;border-radius:8px;margin-top:6px;position:relative;overflow:hidden;transition:background 0.3s,transform 0.15s}
+.btn-main:hover{background:var(--gold-light)}
+.btn-main:active{transform:scale(0.986)}
+.btn-main.loading{pointer-events:none;opacity:0.75}
+.bs{display:none;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto}
+.btn-main.loading .bt{display:none}
+.btn-main.loading .bs{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.terms{font-size:11px;color:rgba(138,127,114,0.5);text-align:center;margin-top:14px;line-height:1.7}
+.terms a{color:var(--gold);text-decoration:none}
+.toast-bar{position:relative;margin-top:16px;padding:11px 18px;border-radius:6px;background:var(--gold);color:#080808;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-align:center;opacity:0;transform:translateY(6px);transition:opacity 0.35s,transform 0.35s;pointer-events:none}
+.toast-bar.show{opacity:1;transform:translateY(0)}
+@media(max-width:860px){.wrapper{grid-template-columns:1fr}.left-panel{display:none}.right-panel{padding:40px 28px}}
+</style>
+
+<div class="wrapper">
+  <div class="left-panel">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="ghost-wrap" id="ghosts">
+      <div class="gw">MODE</div>
+      <div class="gw">LUXE</div>
+      <div class="gw">FASHION</div>
+    </div>
+    <div class="brand-block">
+      <div class="brand-eyebrow">Fashion store</div>
+      <div class="brand-name">FASHION<em>Store</em></div>
+      <p class="brand-desc">L'élégance n'est pas une question de tenue, c'est une façon d'être — raffinée, singulière, intemporelle.</p>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="form-card">
+      <div class="form-hero">
+        <div class="fh-bg"></div>
+        <div class="fh-glow"></div>
+        <div class="fh-content">
+          <div class="fh-title" id="fhTitle">Bienvenue</div>
+          <div class="fh-sub" id="fhSub">Connexion à votre espace membre</div>
+        </div>
+      </div>
+
+      <div class="form-header">
+        <div class="f-eyebrow">Accès membre</div>
+        <div class="f-title" id="fTitle">Votre espace <em>personnel</em></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="sw('login')">Connexion</div>
+        <div class="tab" onclick="sw('register')">Inscription</div>
+      </div>
+
+      <div class="sections-wrap" id="sectionsWrap">
+
+        <div class="form-section" id="loginSection">
+          <div class="fg">
+            <label>Adresse email</label>
+            <div class="iw">
+              <input type="email" id="login_email" placeholder="votre@email.com">
+              <span class="i-icon">✦</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Mot de passe</label>
+            <div class="iw">
+              <input type="password" id="login_password" placeholder="••••••••••">
+              <span class="i-icon">◈</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Type de compte</label>
+            <div class="sw">
+              <select id="login_role">
+                <option value="client">Client</option>
+                <option value="admin">Administrateur</option>
+              </select>
+            </div>
+          </div>
+          <div class="forgot"><a href="#">Mot de passe oublié ?</a></div>
+          <button class="btn-main" id="btnLogin" onclick="login()">
+            <span class="bt">Accéder à mon espace</span><div class="bs"></div>
+          </button>
+        </div>
+
+        <div class="form-section hidden-right" id="registerSection">
+          <div class="fg">
+            <label>Nom complet</label>
+            <div class="iw">
+              <input type="text" id="name" placeholder="Prénom Nom">
+              <span class="i-icon">◇</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Adresse email</label>
+            <div class="iw">
+              <input type="email" id="email" placeholder="votre@email.com">
+              <span class="i-icon">✦</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Mot de passe</label>
+            <div class="iw">
+              <input type="password" id="password" placeholder="Minimum 8 caractères">
+              <span class="i-icon">◈</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Type de compte</label>
+            <div class="sw">
+              <select id="role" onchange="toggleCode()">
+                <option value="client">Client</option>
+                <option value="admin">Administrateur</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-field" id="adminField">
+            <div class="fg">
+              <label>Code d'accès admin</label>
+              <div class="iw">
+                <input type="text" id="code_secret" placeholder="Code confidentiel">
+                <span class="i-icon">⬡</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-main" id="btnReg" onclick="register()">
+            <span class="bt">Créer mon compte</span><div class="bs"></div>
+          </button>
+          <p class="terms">En créant un compte, vous acceptez nos <a href="#">Conditions</a> et notre <a href="#">Politique de confidentialité</a></p>
+        </div>
+
+      </div>
+
+      <div class="toast-bar" id="toast"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentTab = 'login';
+
+function sw(tab) {
+  if (tab === currentTab) return;
+  const goRight = tab === 'register';
+  const outClass = goRight ? 'hidden-left' : 'hidden-right';
+  const inClass  = goRight ? 'hidden-right' : 'hidden-left';
+
+  const loginSec = document.getElementById('loginSection');
+  const regSec   = document.getElementById('registerSection');
+  const active   = currentTab === 'login' ? loginSec : regSec;
+  const incoming = tab === 'login' ? loginSec : regSec;
+
+  active.classList.add(outClass);
+  incoming.classList.remove('hidden-left', 'hidden-right');
+
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.style.height = wrap.offsetHeight + 'px';
+  setTimeout(() => { wrap.style.height = 'auto'; }, 420);
+
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+  });
+
+  const fhTitle = document.getElementById('fhTitle');
+  const fhSub   = document.getElementById('fhSub');
+  fhTitle.classList.add('switching');
+  fhSub.classList.add('switching');
+  setTimeout(() => {
+    if (tab === 'login') {
+      fhTitle.textContent = 'Bienvenue';
+      fhSub.textContent   = 'Connexion à votre espace membre';
+      document.getElementById('fTitle').innerHTML = 'Votre espace <em>personnel</em>';
+    } else {
+      fhTitle.textContent = 'Rejoignez-nous';
+      fhSub.textContent   = 'Créez votre compte exclusif';
+      document.getElementById('fTitle').innerHTML = 'Créer un <em>compte</em>';
+    }
+    fhTitle.classList.remove('switching');
+    fhSub.classList.remove('switching');
+  }, 200);
+
+  currentTab = tab;
+}
+
+function toggleCode() {
+  document.getElementById('adminField').classList.toggle('visible', document.getElementById('role').value === 'admin');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function setLoad(id, v) { document.getElementById(id).classList.toggle('loading', v); }
+
+function login() {
+  setLoad('btnLogin', true);
+  fetch('/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      email: document.getElementById('login_email').value,
+      password: document.getElementById('login_password').value,
+      role: document.getElementById('login_role').value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    setLoad('btnLogin', false);
+    if (d.redirect) {
+      toast('Connexion réussie ✦');
+      setTimeout(() => { window.location.href = d.redirect; }, 1000);
+    } else {
+      toast(d.error || 'Erreur de connexion');
+    }
+  })
+  .catch(() => { setLoad('btnLogin', false); toast('Erreur serveur'); });
+}
+
+function register() {
+  setLoad('btnReg', true);
+  fetch('/register', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value,
+      role: document.getElementById('role').value,
+      code_secret: document.getElementById('code_secret').value
+    })
+  })
+  .then(r => r.json())
+  .then(d => { setLoad('btnReg', false); toast(d.message || d.error || 'Compte créé ✦'); })
+  .catch(() => { setLoad('btnReg', false); toast('Compte créé avec succès ✦'); });
+}
+
+document.addEventListener('mousemove', e => {
+  const gw = document.querySelectorAll('.gw');
+  const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+  const dx = (e.clientX - cx) / cx, dy = (e.clientY - cy) / cy;
+  gw.forEach((w, i) => {
+    const s = (i + 1) * 7;
+    w.style.transform = `translate(${dx * s}px, ${dy * s * 0.45}px)`;
+  });
+});
+</script>
+</body>
+</html>

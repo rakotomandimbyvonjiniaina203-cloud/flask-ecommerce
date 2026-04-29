@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:#0d0d0f;color:white;overflow-x:hidden}
+:root{
+  --gold:#C9A84C;
+  --gold2:#e6c76b;
+  --dark2:#161619;
+  --dark3:#1e1e23;
+  --red:#e05555;
+  --green:#4caf7d;
+}
+#app{display:flex;height:100vh}
+
+/* SIDEBAR */
+#sidebar{
+  width:70px;background:var(--dark2);
+  transition:.3s;overflow:hidden;
+  border-right:1px solid #222;flex-shrink:0;
+}
+#sidebar.open{width:220px}
+.nav-item{
+  padding:16px 20px;cursor:pointer;color:#666;
+  font-size:13px;letter-spacing:.05em;font-weight:600;
+  white-space:nowrap;transition:.2s;
+  border-left:3px solid transparent;
+}
+.nav-item:hover,.nav-item.active{
+  color:var(--gold);border-left-color:var(--gold);
+  background:rgba(201,168,76,.06);
+}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{
+  height:58px;background:var(--dark2);
+  display:flex;align-items:center;padding:0 22px;
+  gap:14px;border-bottom:1px solid #222;
+}
+.topbar-title{font-size:15px;font-weight:700;color:#fff;letter-spacing:.04em}
+.topbar-badge{
+  background:rgba(201,168,76,.15);color:var(--gold);
+  padding:3px 10px;border-radius:20px;font-size:11px;
+  font-family:'DM Mono',monospace;font-weight:500;
+}
+.topbar-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.logout-btn{
+  background:rgba(224,85,85,.12);color:var(--red);
+  border:1px solid rgba(224,85,85,.25);padding:6px 14px;
+  border-radius:8px;cursor:pointer;font-size:12px;
+  font-family:'Syne',sans-serif;font-weight:600;
+  transition:.15s;text-decoration:none;
+}
+.logout-btn:hover{background:rgba(224,85,85,.22)}
+
+.content{padding:24px;overflow-y:auto;flex:1}
+.section-header{
+  display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:18px;
+}
+.section-title{font-size:18px;font-weight:800;letter-spacing:.03em}
+
+/* TABLE */
+.products-table{
+  background:var(--dark3);border-radius:14px;
+  overflow:hidden;border:1px solid #2a2a30;
+}
+table{width:100%;border-collapse:collapse}
+thead{background:#111115}
+th{
+  padding:12px 16px;text-align:left;
+  font-size:11px;letter-spacing:.1em;color:#666;
+  font-weight:600;text-transform:uppercase;
+  font-family:'DM Mono',monospace;
+}
+td{padding:12px 16px;border-top:1px solid #1f1f26;vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+.product-img{
+  width:46px;height:46px;border-radius:8px;
+  object-fit:cover;border:1px solid #2a2a30;background:#111;
+}
+.product-name{font-weight:600;font-size:14px}
+.price-tag{
+  font-family:'DM Mono',monospace;font-size:13px;
+  color:var(--gold);font-weight:500;
+}
+.stock-tag{
+  display:inline-block;padding:2px 10px;border-radius:20px;
+  font-size:11px;font-family:'DM Mono',monospace;font-weight:500;
+}
+.stock-ok{background:rgba(76,175,125,.12);color:var(--green)}
+.stock-low{background:rgba(224,85,85,.12);color:var(--red)}
+.actions{display:flex;gap:7px}
+.empty-state{text-align:center;padding:50px;color:#444;font-size:14px}
+
+/* BUTTONS */
+.btn{
+  padding:7px 13px;border-radius:8px;border:none;
+  cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;
+  font-weight:600;transition:.15s;letter-spacing:.03em;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0d0d0f;
+}
+.btn-edit{
+  background:rgba(201,168,76,.15);color:var(--gold);
+  border:1px solid rgba(201,168,76,.3);
+}
+.btn-edit:hover{background:rgba(201,168,76,.25)}
+.btn-del{
+  background:rgba(224,85,85,.12);color:var(--red);
+  border:1px solid rgba(224,85,85,.25);
+}
+.btn-del:hover{background:rgba(224,85,85,.22)}
+.btn-cancel{
+  background:#1a1a20;color:#888;
+  border:1px solid #2e2e38;
+}
+.btn-cancel:hover{color:#fff;border-color:#444}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;justify-content:center;align-items:center;
+  z-index:100;backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:#1e1e23;padding:28px;border-radius:16px;width:380px;
+  border:1px solid #2e2e38;
+  animation:pop .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pop{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.modal h3{font-size:17px;font-weight:800;margin-bottom:20px;color:#fff}
+.field-label{
+  font-size:11px;color:#666;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:600;
+  margin-bottom:5px;font-family:'DM Mono',monospace;
+}
+.modal input,.modal textarea{
+  width:100%;margin-bottom:14px;padding:9px 12px;
+  background:#111115;border:1px solid #2e2e38;color:white;
+  border-radius:8px;font-size:13px;font-family:'Syne',sans-serif;
+  transition:.2s;outline:none;
+}
+.modal input:focus,.modal textarea:focus{
+  border-color:var(--gold);background:#13130f;
+}
+.modal textarea{resize:vertical;min-height:70px}
+.modal-btns{display:flex;gap:10px;margin-top:4px}
+.modal-btns .btn{flex:1;padding:10px}
+
+/* CONFIRM DELETE */
+.confirm-modal{text-align:center}
+.confirm-modal p{color:#aaa;font-size:13px;margin-bottom:20px;line-height:1.6}
+.confirm-modal strong{color:#fff}
+.del-icon{font-size:40px;margin-bottom:14px}
+
+/* HAMBURGER */
+.hamburger{
+  background:none;border:none;color:var(--gold);
+  font-size:20px;cursor:pointer;padding:6px 8px;
+  border-radius:6px;transition:.15s;
+}
+.hamburger:hover{background:rgba(201,168,76,.1)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  padding:12px 20px;border-radius:10px;
+  font-size:13px;font-weight:600;
+  z-index:999;opacity:0;transform:translateY(10px);
+  transition:.3s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:#1a3a28;color:#4caf7d;border:1px solid #2a5a38}
+.toast.error{background:#3a1a1a;color:#e05555;border:1px solid #5a2a2a}
+
+/* LOADING */
+.spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(0,0,0,.3);border-top-color:#0d0d0f;
+  border-radius:50%;animation:spin .6s linear infinite;
+  margin-right:6px;vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="nav-item active" onclick="navigate(this)">📦 Produits</div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="topbar-title">Admin Dashboard</span>
+      <span class="topbar-badge" id="prod-count">…</span>
+      <div class="topbar-right">
+        <a href="/logout" class="logout-btn">Déconnexion</a>
+      </div>
+    </div>
+    <div class="content">
+      <div class="section-header">
+        <span class="section-title">Gestion des Produits</span>
+        <button class="btn btn-gold" onclick="openAddModal()">+ Ajouter un produit</button>
+      </div>
+      <div class="products-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Nom</th>
+              <th>Prix</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products">
+            <tr><td colspan="5" class="empty-state">Chargement des produits…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL AJOUTER ===== -->
+  <div class="modal-overlay" id="modal-add">
+    <div class="modal">
+      <h3>➕ Ajouter un produit</h3>
+      <div class="field-label">Nom du produit *</div>
+      <input id="add-nom" placeholder="Ex: Chaussure Nike Air Max">
+      <div class="field-label">Prix (Ar) *</div>
+      <input id="add-prix" type="number" min="0" placeholder="Ex: 150000">
+      <div class="field-label">Stock *</div>
+      <input id="add-stock" type="number" min="0" placeholder="Ex: 50">
+      <div class="field-label">Description</div>
+      <textarea id="add-desc" placeholder="Description du produit (optionnel)"></textarea>
+      <div class="field-label">Image</div>
+      <input type="file" id="add-image" accept="image/*">
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="btn-add-submit" onclick="addProduct()">Ajouter</button>
+        <button class="btn btn-cancel" onclick="closeModal('modal-add')">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL MODIFIER ===== -->
+  <div class="modal-overlay" id="modal-edit">
+    <div class="modal">
+      <h3>✏️ Modifier le produit</h3>
+      <input type="hidden" id="edit-id">
+      <div class="field-label">Nom du produit *</div>
+      <input id="edit-nom" placeholder="Nom">
+      <div class="field-label">Prix (Ar) *</div>
+      <input id="edit-prix" type="number" min="0" placeholder="Prix">
+      <div class="field-label">Stock *</div>
+      <input id="edit-stock" type="number" min="0" placeholder="Stock">
+      <div class="field-label">Description</div>
+      <textarea id="edit-desc" placeholder="Description"></textarea>
+      <div class="field-label">Nouvelle image (optionnel)</div>
+      <input type="file" id="edit-image" accept="image/*">
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="btn-edit-submit" onclick="saveEdit()">💾 Sauvegarder</button>
+        <button class="btn btn-cancel" onclick="closeModal('modal-edit')">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL SUPPRIMER ===== -->
+  <div class="modal-overlay" id="modal-del">
+    <div class="modal confirm-modal">
+      <div class="del-icon">🗑️</div>
+      <h3>Supprimer ce produit ?</h3>
+      <p>Vous êtes sur le point de supprimer<br><strong id="del-nom-display"></strong>.<br>Cette action est <strong>irréversible</strong>.</p>
+      <input type="hidden" id="del-id">
+      <div class="modal-btns">
+        <button class="btn btn-del" id="btn-del-submit" onclick="confirmDelete()">🗑️ Supprimer</button>
+        <button class="btn btn-cancel" onclick="closeModal('modal-del')">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ============================================================
+//  UTILITAIRES
+// ============================================================
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast show ' + type;
+  setTimeout(()=>{ t.className='toast' }, 3000);
+}
+
+function setLoading(btnId, loading){
+  const btn = document.getElementById(btnId);
+  if(!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<span class="spinner"></span>Chargement…'
+    : btn.dataset.label || btn.innerHTML;
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+function openModal(id){
+  document.getElementById(id).classList.add('show');
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function navigate(el){
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  loadProducts();
+}
+
+// Fermer modal en cliquant en dehors
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{
+    if(e.target === overlay) overlay.classList.remove('show');
+  });
+});
+
+// ============================================================
+//  CHARGER LES PRODUITS
+// ============================================================
+async function loadProducts(){
+  try {
+    const res  = await fetch('/api/produits', { credentials: 'include' });
+    const data = await res.json();
+    renderProducts(data);
+  } catch(e){
+    console.error('Erreur loadProducts:', e);
+    document.getElementById('products').innerHTML =
+      '<tr><td colspan="5" class="empty-state">Erreur lors du chargement</td></tr>';
+  }
+}
+
+function renderProducts(produits){
+  const badge = document.getElementById('prod-count');
+  badge.textContent = produits.length + ' produit' + (produits.length>1?'s':'');
+
+  const tbody = document.getElementById('products');
+  if(!produits.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucun produit trouvé</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = produits.map(p => {
+    const imgSrc = p.image
+      ? p.image
+      : 'https://placehold.co/46x46/1e1e23/444?text=📦';
+    const stockClass = (p.stock > 5) ? 'stock-ok' : 'stock-low';
+    const prixFormat = Number(p.prix).toLocaleString('fr-MG');
+
+    // On encode le nom pour l'attribut data
+    const nomEsc = p.nom
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, "\\'");
+
+    return `
+      <tr>
+        <td>
+          <img class="product-img"
+               src="${imgSrc}"
+               onerror="this.src='https://placehold.co/46x46/1e1e23/444?text=📦'">
+        </td>
+        <td><div class="product-name">${p.nom}</div></td>
+        <td><span class="price-tag">${prixFormat} Ar</span></td>
+        <td><span class="stock-tag ${stockClass}">${p.stock} unités</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-edit"
+              onclick="openEditModal(${p.id}, '${nomEsc}', ${p.prix}, ${p.stock})">
+              ✏️ Modifier
+            </button>
+            <button class="btn btn-del"
+              onclick="openDeleteModal(${p.id}, '${nomEsc}')">
+              🗑️ Supprimer
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ============================================================
+//  AJOUTER UN PRODUIT
+// ============================================================
+function openAddModal(){
+  // Réinitialiser le formulaire
+  document.getElementById('add-nom').value   = '';
+  document.getElementById('add-prix').value  = '';
+  document.getElementById('add-stock').value = '';
+  document.getElementById('add-desc').value  = '';
+  document.getElementById('add-image').value = '';
+  openModal('modal-add');
+}
+
+async function addProduct(){
+  const nom   = document.getElementById('add-nom').value.trim();
+  const prix  = document.getElementById('add-prix').value.trim();
+  const stock = document.getElementById('add-stock').value.trim();
+  const desc  = document.getElementById('add-desc').value.trim();
+  const image = document.getElementById('add-image').files[0];
+
+  if(!nom){  showToast('Le nom du produit est requis', 'error'); return; }
+  if(!prix){ showToast('Le prix est requis', 'error'); return; }
+
+  const formData = new FormData();
+  formData.append('nom',         nom);
+  formData.append('prix',        prix);
+  formData.append('stock',       stock || 0);
+  formData.append('description', desc || '');
+  if(image) formData.append('image', image);
+
+  setLoading('btn-add-submit', true);
+  try {
+    const res  = await fetch('/api/produits', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+    const data = await res.json();
+    if(data.error){
+      showToast(data.error, 'error');
+    } else {
+      showToast('✅ Produit ajouté avec succès');
+      closeModal('modal-add');
+      loadProducts();
+    }
+  } catch(e){
+    console.error('Erreur addProduct:', e);
+    showToast('Erreur réseau', 'error');
+  } finally {
+    const btn = document.getElementById('btn-add-submit');
+    if(btn){ btn.disabled=false; btn.textContent='Ajouter'; }
+  }
+}
+
+// ============================================================
+//  MODIFIER UN PRODUIT
+// ============================================================
+function openEditModal(id, nom, prix, stock){
+  document.getElementById('edit-id').value    = id;
+  document.getElementById('edit-nom').value   = nom;
+  document.getElementById('edit-prix').value  = prix;
+  document.getElementById('edit-stock').value = stock;
+  document.getElementById('edit-desc').value  = '';
+  document.getElementById('edit-image').value = '';
+  openModal('modal-edit');
+}
+
+async function saveEdit(){
+  const id    = document.getElementById('edit-id').value;
+  const nom   = document.getElementById('edit-nom').value.trim();
+  const prix  = document.getElementById('edit-prix').value.trim();
+  const stock = document.getElementById('edit-stock').value.trim();
+  const desc  = document.getElementById('edit-desc').value.trim();
+  const image = document.getElementById('edit-image').files[0];
+
+  if(!nom){  showToast('Le nom est requis', 'error'); return; }
+  if(!prix){ showToast('Le prix est requis', 'error'); return; }
+
+  const formData = new FormData();
+  formData.append('nom',         nom);
+  formData.append('prix',        prix);
+  formData.append('stock',       stock || 0);
+  formData.append('description', desc || '');
+  if(image) formData.append('image', image);
+
+  setLoading('btn-edit-submit', true);
+  try {
+    const res  = await fetch(`/api/produits/${id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      body: formData
+    });
+    const data = await res.json();
+    if(data.error){
+      showToast(data.error, 'error');
+    } else {
+      showToast('✅ Produit modifié avec succès');
+      closeModal('modal-edit');
+      loadProducts();
+    }
+  } catch(e){
+    console.error('Erreur saveEdit:', e);
+    showToast('Erreur réseau', 'error');
+  } finally {
+    const btn = document.getElementById('btn-edit-submit');
+    if(btn){ btn.disabled=false; btn.innerHTML='💾 Sauvegarder'; }
+  }
+}
+
+// ============================================================
+//  SUPPRIMER UN PRODUIT
+// ============================================================
+function openDeleteModal(id, nom){
+  document.getElementById('del-id').value          = id;
+  document.getElementById('del-nom-display').textContent = nom;
+  openModal('modal-del');
+}
+
+async function confirmDelete(){
+  const id = document.getElementById('del-id').value;
+
+  setLoading('btn-del-submit', true);
+  try {
+    const res  = await fetch(`/api/produits/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    if(data.error){
+      showToast(data.error, 'error');
+    } else {
+      showToast('🗑️ Produit supprimé');
+      closeModal('modal-del');
+      loadProducts();
+    }
+  } catch(e){
+    console.error('Erreur confirmDelete:', e);
+    showToast('Erreur réseau', 'error');
+  } finally {
+    const btn = document.getElementById('btn-del-submit');
+    if(btn){ btn.disabled=false; btn.innerHTML='🗑️ Supprimer'; }
+  }
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+loadProducts();
+</script>
+</body>
+</html>
