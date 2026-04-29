@@ -14,14 +14,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ================= DB CONNECTION =================
 def get_conn():
-    return psycopg2.connect(
-        dbname="Ecommerce",
-        user="postgres",
-        password="2005",
-        host="localhost",
-        port="5432"
-    )
-
+    import os
+    DATABASE_URL = os.environ.get("postgresql://flask_db_og3x_user:Tt4E8iwXus67j7mpZxCfoWna4GiZwzNE@dpg-d7p7sve8bjmc739m1b3g-a.virginia-postgres.render.com/flask_db_og3x")
+    return psycopg2.connect(DATABASE_URL, sslmode='require')
 # ================= CALCUL STATS =================
 def calculer_stats_produits(produits):
     total_vues   = sum(p['vues']   for p in produits)
@@ -544,7 +539,6 @@ def follow_produit(produit_id):
         return jsonify({"error": str(e)}), 500
 
 # ================= RUN =================
-if __name__ == '__main__':
-    assurer_contrainte_unique()   # garantit ON CONFLICT sur stats_produit
-    creer_table_follows()         # crée la table follows si absente
-    app.run(debug=True) 
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
