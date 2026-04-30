@@ -16,7 +16,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def get_conn():
     DATABASE_URL = os.environ.get(
         "DATABASE_URL",
-        "postgresql://flask_db_og3x_user:..."
+        "postgresql://flask_db_og3x_users:..."
     )
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 # ================= CALCUL STATS =================
@@ -105,49 +105,50 @@ def assurer_contrainte_unique():
         print("⚠️  assurer_contrainte_unique:", e)
 
 # ================= CRÉER TABLE FOLLOWS si elle n'existe pas =================
-def creer_table_follows():
-    """
-    Crée la table follows et sa contrainte UNIQUE si elles n'existent pas.
+def create_tables():
+    conn = get_conn()
+    cur = conn.cursor()
 
-    Structure :
-        follows(id SERIAL PK, produit_id INT FK, user_id INT FK, created_at TIMESTAMP)
-    """
-    try:
-        conn = get_conn()
-        cur  = conn.cursor()
+    # TABLE USERS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id_users SERIAL PRIMARY KEY,
+            name TEXT,
+            email TEXT UNIQUE,
+            password TEXT,
+            role TEXT,
+            code_secret TEXT
+        );
+    """)
 
-        # Créer la table
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS follows (
-                id         SERIAL PRIMARY KEY,
-                produit_id INTEGER NOT NULL REFERENCES produit(id_produit) ON DELETE CASCADE,
-                user_id    INTEGER NOT NULL REFERENCES users(id_users)     ON DELETE CASCADE,
-                created_at TIMESTAMP DEFAULT NOW()
-            );
-        """)
+    # TABLE PRODUIT
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS produit (
+            id_produit SERIAL PRIMARY KEY,
+            nom_produit TEXT,
+            description_produit TEXT,
+            prix_produit FLOAT,
+            stock INT,
+            image_produit TEXT
+        );
+    """)
 
-        # Contrainte unique pour éviter les doublons (un user ne peut suivre qu'une fois)
-        cur.execute("""
-            DO $$
-            BEGIN
-                IF NOT EXISTS (
-                    SELECT 1 FROM pg_constraint
-                    WHERE conname = 'uq_follows_produit_user'
-                ) THEN
-                    ALTER TABLE follows
-                    ADD CONSTRAINT uq_follows_produit_user
-                    UNIQUE (produit_id, user_id);
-                END IF;
-            END $$;
-        """)
+    # TABLE STATS
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS stats_produit (
+            id SERIAL PRIMARY KEY,
+            produit_id INT,
+            user_id INT,
+            vues INT DEFAULT 0,
+            clicks INT DEFAULT 0,
+            likes INT DEFAULT 0
+        );
+    """)
 
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("✅ Table follows OK")
-    except Exception as e:
-        print("⚠️  creer_table_follows:", e)
-
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("✅ Tables créées")
 # ================================================================
 #  ROUTES
 # ================================================================
@@ -176,7 +177,7 @@ def register():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_user FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_users FROM users WHERE email = %s", (email,))
         if cur.fetchone():
             cur.close(); conn.close()
             return jsonify({"error": "Cet email est déjà utilisé"}), 409
@@ -203,7 +204,7 @@ def login():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_user, name, password, role FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_users, name, password, role FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
         cur.close(); conn.close()
 
@@ -542,5 +543,6 @@ def follow_produit(produit_id):
 
 # ================= RUN =================
 if __name__ == "__main__":
+    create_tables()   # 👈 ITO no tena zava-dehibe
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
