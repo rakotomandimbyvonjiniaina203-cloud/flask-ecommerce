@@ -14,8 +14,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ================= DB CONNECTION =================
 def get_conn():
-    import os
-    DATABASE_URL = os.environ.get("postgresql://flask_db_og3x_user:Tt4E8iwXus67j7mpZxCfoWna4GiZwzNE@dpg-d7p7sve8bjmc739m1b3g-a.virginia-postgres.render.com/flask_db_og3x")
+    DATABASE_URL = os.environ.get(
+        "DATABASE_URL",
+        "postgresql://flask_db_og3x_user:..."
+    )
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 # ================= CALCUL STATS =================
 def calculer_stats_produits(produits):
