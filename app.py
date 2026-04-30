@@ -16,7 +16,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def get_conn():
     DATABASE_URL = os.environ.get(
         "DATABASE_URL",
-        "postgresql://flask_db_og3x_users:..."
+        "postgresql://flask_db_og3x_user:Tt4E8iwXus67j7mpZxCfoWna4GiZwzNE@dpg-d7p7sve8bjmc739m1b3g-a.virginia-postgres.render.com/flask_db_og3x"
     )
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 # ================= CALCUL STATS =================
@@ -104,6 +104,7 @@ def assurer_contrainte_unique():
     except Exception as e:
         print("⚠️  assurer_contrainte_unique:", e)
 
+assurer_contrainte_unique()
 # ================= CRÉER TABLE FOLLOWS si elle n'existe pas =================
 def create_tables():
     conn = get_conn()
@@ -177,7 +178,7 @@ def register():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_users FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_user FROM users WHERE email = %s", (email,))
         if cur.fetchone():
             cur.close(); conn.close()
             return jsonify({"error": "Cet email est déjà utilisé"}), 409
@@ -204,7 +205,7 @@ def login():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_users, name, password, role FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_user, name, password, role FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
         cur.close(); conn.close()
 
@@ -393,8 +394,7 @@ def update_stats(produit_id, action):
     if action not in ('vue', 'click', 'like'):
         return jsonify({"error": "Action inconnue"}), 400
 
-    user_id = session.get('users_id', 0)
-
+    user_id = session.get('user_id', 0)
     try:
         conn = get_conn()
         cur  = conn.cursor()
@@ -470,7 +470,7 @@ def get_stats():
 # =================================================================
 @app.route('/api/follow/<int:produit_id>', methods=['POST', 'DELETE', 'GET'])
 def follow_produit(produit_id):
-    user_id = session.get('users_id')
+    user_id = session.get('user_id')
 
     # GET : retourner le nombre de followers (et si l'utilisateur suit ou non)
     if request.method == 'GET':
@@ -543,6 +543,7 @@ def follow_produit(produit_id):
 
 # ================= RUN =================
 if __name__ == "__main__":
-    create_tables()   # 👈 ITO no tena zava-dehibe
+    create_tables()
+    assurer_contrainte_unique()  # 👈 ZAVA-DEHIBE
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
