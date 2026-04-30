@@ -174,7 +174,7 @@ def register():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_users FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_user FROM users WHERE email = %s", (email,))
         if cur.fetchone():
             cur.close(); conn.close()
             return jsonify({"error": "Cet email est déjà utilisé"}), 409
@@ -201,7 +201,7 @@ def login():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_users, name, password, role FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_user, name, password, role FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
         cur.close(); conn.close()
 
@@ -212,7 +212,7 @@ def login():
         if user[3] != role_req:
             return jsonify({"error": f"Ce compte n'est pas un compte {role_req}"}), 403
 
-        session['users_id'] = user[0]
+        session['user_id'] = user[0]
         session['name']     = user[1]
         session['role']     = user[3]
 
