@@ -139,7 +139,7 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS stats_produit (
             id SERIAL PRIMARY KEY,
             produit_id INT,
-            user_id INT,
+            users_id INT,
             vues INT DEFAULT 0,
             clicks INT DEFAULT 0,
             likes INT DEFAULT 0
@@ -178,7 +178,7 @@ def register():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_user FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_users FROM users WHERE email = %s", (email,))
         if cur.fetchone():
             cur.close(); conn.close()
             return jsonify({"error": "Cet email est déjà utilisé"}), 409
@@ -205,7 +205,7 @@ def login():
     try:
         conn = get_conn()
         cur  = conn.cursor()
-        cur.execute("SELECT id_user, name, password, role FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT id_users, name, password, role FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
         cur.close(); conn.close()
 
@@ -216,7 +216,7 @@ def login():
         if user[3] != role_req:
             return jsonify({"error": f"Ce compte n'est pas un compte {role_req}"}), 403
 
-        session['user_id'] = user[0]
+        session['users_id'] = user[0]
         session['name']     = user[1]
         session['role']     = user[3]
 
@@ -394,18 +394,18 @@ def update_stats(produit_id, action):
     if action not in ('vue', 'click', 'like'):
         return jsonify({"error": "Action inconnue"}), 400
 
-    user_id = session.get('user_id', 0)
+    user_id = session.get('users_id', 0)
     try:
         conn = get_conn()
         cur  = conn.cursor()
 
         if action == 'vue':
             cur.execute("""
-                INSERT INTO stats_produit (produit_id, user_id, vues, clicks, likes)
+                INSERT INTO stats_produit (produit_id, users_id, vues, clicks, likes)
                 VALUES (%s, %s, 1, 0, 0)
-                ON CONFLICT (produit_id, user_id)
+                ON CONFLICT (produit_id, users_id)
                 DO UPDATE SET vues = stats_produit.vues + 1
-            """, (produit_id, user_id))
+            """, (produit_id, users_id))
 
         elif action == 'click':
             cur.execute("""
@@ -417,11 +417,11 @@ def update_stats(produit_id, action):
 
         elif action == 'like':
             cur.execute("""
-                INSERT INTO stats_produit (produit_id, user_id, vues, clicks, likes)
+                INSERT INTO stats_produit (produit_id, users_id, vues, clicks, likes)
                 VALUES (%s, %s, 0, 0, 1)
-                ON CONFLICT (produit_id, user_id)
+                ON CONFLICT (produit_id, users_id)
                 DO UPDATE SET likes = stats_produit.likes + 1
-            """, (produit_id, user_id))
+            """, (produit_id, users_id))
 
         conn.commit()
 
